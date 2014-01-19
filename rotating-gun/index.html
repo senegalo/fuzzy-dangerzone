@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Servo Control</title>
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                var send = function(value,command,lowerLimit,upperLimit){
+                upperLimit = upperLimit || 180;
+                lowerLimit = lowerLimit || 0;
+                try{
+                  var angle = parseInt(value);
+                  if(angle < lowerLimit || angle > upperLimit){
+                      throw angle
+                  } else {
+                      $(".buttons").attr("disabled","disabled");
+                      $.post("servo.php",{
+                        angle: angle,
+                        command: command
+                      },function(){
+                          setTimeout(function(){
+                              $(".buttons").removeAttr("disabled");
+                          },3000);
+                      });
+                  }
+                } catch (e){
+                    alert("Invalid number\nOnly number allowed between "+lowerLimit+" and "+upperLimit);
+                }
+                }
+
+                $("#send-angle").click(function(){
+                      send($("#angle").val(),"a");
+                });
+                $("#send-pitch").click(function(){
+                    send($("#pitch").val(),"b",0,90);
+                });
+                $("#trigger").click(function(){
+                    send(0,"c");
+                });
+            });
+        </script>
+    </head>
+    <body>
+      <input type="text" id="angle" value="0"/><button id="send-angle" class="buttons">Send Angle</button><i>Angle should be between 0 and 180</i><br/>
+      <input type="text" id="pitch" value="0"/><button id="send-pitch" class="buttons">Send Pitch</button><i>Angle should be between 0 and 90</i></br/>
+      <button id="trigger" class="buttons">Piw Piw "aka Trigger"</button> <br/>
+      <br/>
+      <b>Live Feed</b></br>
+      <iframe src="http://embed.bambuser.com/channel/senegalo" width="460" height="403" frameborder="0">Your browser does not support iframes.</iframe>
+    </body>
+  </html>
